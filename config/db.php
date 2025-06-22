@@ -2,13 +2,11 @@
 
 return [
     'class' => 'yii\db\Connection',
-    'dsn' => 'mysql:host=localhost;dbname=mysite_db',
-    'username' => 'root',
-    'password' => '',
+    'dsn' => 'mysql:host=' . (getenv('MYSQLHOST') ?: 'shortline.proxy.rlwy.net') . 
+             ';port=' . (getenv('MYSQLPORT') ?: '28704') . 
+             ';dbname=' . (getenv('MYSQLDATABASE') ?: 'railway'),
+    'username' => getenv('MYSQLUSER') ?: 'root',
+    'password' => getenv('MYSQLPASSWORD') ?: 'IZezOaVCEMegHhDKOcfYjetCvqxSQzEJ',
     'charset' => 'utf8',
-
-    // Schema cache options (for production environment)
-    //'enableSchemaCache' => true,
-    //'schemaCacheDuration' => 60,
-    //'schemaCache' => 'cache',
 ];
+
