@@ -76,6 +76,12 @@ public function actionIndex($offset = 0)
         ->with('images', 'user') // eager load relations
         ->all();
 
+    $products = Product::find()
+    ->with(['images', 'user','comments.user', 'recentComments.user']) // eager-load to reduce queries
+    ->orderBy(['created_at' => SORT_DESC])
+    ->all();
+
+
     // AJAX load more request
     if (Yii::$app->request->isAjax) {
         return $this->renderPartial('_feed_items', [

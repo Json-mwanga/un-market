@@ -7,14 +7,14 @@ class Comment extends ActiveRecord
 {
     public static function tableName()
     {
-        return 'comment';
+        return 'product_comment';
     }
 
     public function rules()
     {
         return [
-            [['content', 'product_id', 'user_id', 'created_at'], 'required'],
-            [['content'], 'string'],
+            [['comment', 'product_id', 'user_id', 'created_at'], 'required'],
+            [['comment'], 'string'],
         ];
     }
 

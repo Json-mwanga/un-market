@@ -23,13 +23,12 @@ class Product extends ActiveRecord
     public function rules()
     {
         return [
-            [['user_id', 'name'], 'required'],
+            [['user_id', 'name', 'price' ], 'required'],
             [['user_id'], 'integer'],
+            [['price'], 'number'],
             [['description'], 'string'],
             [['created_at'], 'safe'],
             [['name'], 'string', 'max' => 255],
-
-            // imageFiles validation for multiple files, max 5 images allowed
             [['imageFiles'], 'file', 'skipOnEmpty' => true, 'maxFiles' => 5, 'extensions' => 'png, jpg, jpeg, gif'],
         ];
     }
@@ -64,4 +63,24 @@ class Product extends ActiveRecord
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }
+
+    public function getrecentComments()
+    {
+        return $this->hasMany(Comment::class, ['product_id' => 'id'])
+            ->orderBy(['created_at' => SORT_DESC])
+            ->limit(1); // or 2, as needed
+    }
+
+    public function getComments()
+    {
+        return $this->hasMany(Comment::class, ['product_id' => 'id'])
+            ->orderBy(['created_at' => SORT_DESC])
+            ->with('user'); // preload user for each comment
+    }
+
+
+
+
+
+
 }

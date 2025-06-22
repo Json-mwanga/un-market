@@ -1,490 +1,273 @@
 <?php
-use yii\widgets\ActiveForm;
 use yii\helpers\Html;
 use yii\helpers\Url;
-use yii\bootstrap5\Modal;
 
-$js = <<<JS
-// Toggle between view and edit mode for address and bio
-document.getElementById('edit-profile-btn').addEventListener('click', function() {
-    // Hide Edit button, show Submit button and form inputs
-    this.style.display = 'none';
-    document.getElementById('submit-profile-btn').style.display = 'inline-block';
+/** @var yii\web\View $this */
+/** @var array $products */
 
-    // Show inputs
-    document.querySelectorAll('.editable-field').forEach(el => el.style.display = 'block');
-    // Hide text spans
-    document.querySelectorAll('.readonly-field').forEach(el => el.style.display = 'none');
-});
-JS;
-$this->registerJs($js);
-
-$this->registerCss("
-.cover-photo {
-    background: url('". ($user->cover_image ? Url::to('@web/' . $user->cover_image) : Url::to('@web/images/cover-placeholder.jpg')) ."') no-repeat center center;
-    background-size: cover;
-    height: 250px;
-    position: relative;
-}
-
-.cover-edit-icon {
-    position: absolute;
-    top: 10px;
-    right: 20px;
-    background: #007bff;
-    color: white;
-    border-radius: 50%;
-    padding: 6px;
-    cursor: pointer;
-    font-size: 14px;
-    z-index: 2;
-}
-
-.logout-icon-container {
-    position: absolute;
-    top: 10px;
-    right: 80px; /* left of cover-edit-icon */
-    z-index: 2;
-}
-
-#logout-btn {
-    padding: 6px 14px;
-    font-size: 14px;
-    font-weight: 600;
-    background-color: #007bff;
-    border: none;
-    color: white;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-#logout-btn:hover {
-    background-color: #0056b3;
-}
-
-.profile-container {
-    position: absolute;
-    bottom: -70px;
-    left: 30px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.profile-image {
-    width: 140px;
-    height: 140px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 4px solid #fff;
-}
-
-.edit-icon {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    background: #007bff;
-    color: white;
-    border-radius: 50%;
-    padding: 6px;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-#profile-image-input {
-    display: none;
-}
-
-.profile-details {
-    margin-top: 90px;
-    padding: 20px;
-}
-
-#submit-profile-btn {
-    display: none; /* Hidden initially */
-}
-");
-
+$this->title = 'Home';
 ?>
 
-<?php $form = ActiveForm::begin([
-    'action' => ['site/update-profile'],
-    'options' => ['enctype' => 'multipart/form-data'],
-]); ?>
+<style>
+/* Header styling */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+}
 
-<!-- Cover Photo -->
-<div class="cover-photo">
+.site-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
 
-    <!-- Logout button -->
-    <div class="logout-icon-container">
-        <?= Html::beginForm(['/site/logout'], 'post') ?>
-        <?= Html::submitButton('Logout', ['id' => 'logout-btn']) ?>
-        <?= Html::endForm() ?>
-    </div>
+.site-logo img {
+    height: 40px;
+}
 
-    <!-- Cover image edit icon -->
-    <label for="cover-image-input" class="cover-edit-icon" title="Edit Cover Image">✎</label>
-    <?= $form->field($user, 'cover_image')->fileInput([
-        'id' => 'cover-image-input',
-        'onchange' => 'this.form.submit()'
-    ])->label(false) ?>
+.nav-links {
+    margin-top: 10px;
+    display: flex;
+    gap: 20px;
+    padding: 10px 30px;
+    background-color: #ffffff;
+    border-bottom: 1px solid #dee2e6;
+}
 
-    <!-- Profile photo container -->
-    <div class="profile-container">
-        <?= Html::img(
-            $user->profile_image ? Url::to('@web/' . $user->profile_image) : Url::to('@web/images/default-profile.png'),
-            ['class' => 'profile-image']
-        ) ?>
-        <label for="profile-image-input" class="edit-icon" title="Edit Profile Image">✎</label>
-    </div>
-</div>
+.nav-links a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+}
 
-<?= $form->field($user, 'profile_image')->fileInput([
-    'id' => 'profile-image-input',
-    'onchange' => 'this.form.submit()'
-])->label(false) ?>
+.nav-links a:hover {
+    text-decoration: underline;
+}
 
-<!-- Profile Information -->
-<div class="profile-details">
-    <h2>
-        Profile Information
-        <?= Html::button('Edit', ['id' => 'edit-profile-btn', 'class' => 'btn btn-sm btn-secondary', 'style' => 'margin-left:10px;']) ?>
-    </h2>
+/* Profile image on top right */
+.profile-thumb {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    cursor: pointer;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;      /* makes it circular */
+    object-fit: cover;       /* ensures image covers area without distortion */
+    border: 2px solid #ddd;  /* optional subtle border */
+    margin-right: 10px;      /* space between image and name */
+    vertical-align: middle;  /* aligns nicely with text */
+    display: inline-block;
+}
 
-    <p><strong>First Name:</strong> <?= Html::encode($user->first_name) ?></p>
-    <p><strong>Last Name:</strong> <?= Html::encode($user->last_name) ?></p>
-    <p><strong>Email:</strong> <?= Html::encode($user->email) ?></p>
-    <p><strong>Phone Number:</strong> <?= Html::encode($user->phone_number) ?></p>
 
-    <div class="row">
-        <div class="col-md-6">
-            <!-- Display mode -->
-            <p class="readonly-field"><strong>Address:</strong> <?= Html::encode($user->address) ?></p>
-            <!-- Edit mode input -->
-            <div class="editable-field" style="display:none;">
-                <?= $form->field($user, 'address')->textInput()->label(false) ?>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <!-- Display mode -->
-            <p class="readonly-field"><strong>Bio:</strong> <?= nl2br(Html::encode($user->bio)) ?></p>
-            <!-- Edit mode textarea -->
-            <div class="editable-field" style="display:none;">
-                <?= $form->field($user, 'bio')->textarea(['rows' => 3])->label(false) ?>
-            </div>
-        </div>
-    </div>
 
-    <div class="form-group">
-        <?= Html::submitButton('Update Profile', ['class' => 'btn btn-primary', 'id' => 'submit-profile-btn']) ?>
-    </div>
-</div>
+/* Product feed */
+.product-feed {
+    padding: 30px;
+}
 
-<?php ActiveForm::end(); ?>
+.product-card {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  padding: 15px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s ease;
+}
 
-<!-- PRODUCT UPLOAD FORM -->
-<hr>
-<h2>Your Products</h2>
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+}
 
-<?php $productForm = ActiveForm::begin([
-    'action' => ['site/upload-product'],
-    'options' => ['enctype' => 'multipart/form-data'],
-]); ?>
+.product-card .product-image {
+  width: 100%;
+  height: 270px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
 
-<div class="row">
-    <div class="col-md-6">
-        <?= $productForm->field($productModel, 'name')->textInput(['maxlength' => true]) ?>
-    </div>
-    <div class="col-md-6">
-        <?= $productForm->field($productModel, 'price')->textInput(['type' => 'number', 'step' => '0.01', 'min' => 0]) ?>
-    </div>
-</div>
+.product-card .product-title {
+  font-weight: 600;
+  font-size: 1.2rem;
+  margin-bottom: 5px;
+  color: #333;
+}
 
-<?= $productForm->field($productModel, 'description')->textarea(['rows' => 3]) ?>
+.product-card .product-price {
+  color: #2c7a7b;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
 
-<?= $productForm->field($productModel, 'status')->dropDownList([
-    'on_sale' => 'On Sale',
-    'sold' => 'Sold',
-]) ?>
+.product-card .product-description {
+  font-size: 0.9rem;
+  color: #555;
+  max-height: 3.6em; /* roughly 2 lines */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 15px;
+}
 
-<?= $productForm->field($productModel, 'imageFiles[]')->fileInput([
-    'multiple' => true,
-    'accept' => 'image/*',
-])->label('Upload Images (max 5)') ?>
+.product-card .product-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
 
-<div class="form-group">
-    <?= Html::submitButton('Upload Product', ['class' => 'btn btn-success']) ?>
-</div>
+.product-card button,
+.product-card a.button-link {
+  flex: 1;
+  padding: 8px 12px;
+  background-color: #3182ce;
+  border: none;
+  border-radius: 6px;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  transition: background-color 0.2s ease;
+}
 
-<?php ActiveForm::end(); ?>
+.product-card button:hover,
+.product-card a.button-link:hover {
+  background-color: #2c5282;
+}
 
-<!-- DISPLAY USERS PRODUCTS -->
-<div class="product-grid" style="display:flex; flex-wrap:wrap; gap:10px;">
+
+.product-details {
+    flex-grow: 1;
+}
+
+.product-details h4 {
+    margin: 0 0 10px;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.user-info img {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.product-status {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: white;
+  border: 2px solid transparent;
+  background-color: #38a169 !important;
+  border-color: #2f855a !important;
+  min-width: 80px;
+  text-align: center;
+  user-select: none;
+}
+
+.status-on-sale {
+  background-color: #38a169; /* green */
+  border-color: #2f855a;
+}
+
+.status-sold-out {
+  background-color: #e53e3e; /* red */
+  border-color: #c53030;
+}
+
+.status-pre-order {
+  background-color: #dd6b20; /* orange */
+  border-color: #b45309;
+}
+
+.status-default {
+  background-color: #718096; /* gray */
+  border-color: #4a5568;
+}
+
+.product-description {
+  max-height: 4.5em;           /* Limit height to ~3 lines */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;       /* Limit to 3 lines */
+  -webkit-box-orient: vertical;
+  line-height: 1.5em;
+}
+
+
+</style>
+
+<!-- Product Feed -->
+<div class="product-feed">
     <?php foreach ($products as $product): ?>
-        <div class="product-item" style="width:120px; text-align:center; cursor:pointer;" data-id="<?= $product->id ?>">
-            <?php
-            $img = ($product->images && count($product->images) > 0)
-                ? Url::to('@web/' . $product->images[0]->image_path)
-                : Url::to('@web/images/no-image.png');
-            ?>
-            <?= Html::img($img, ['style' => 'width:100%; height:100px; object-fit:cover; border-radius:6px;']) ?>
-            <div style="font-size: 13px; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                <?= Html::encode($product->name) ?>
+        <div class="product-card">
+            <!-- Product image -->
+            <?= Html::a(
+                Html::img(
+                    isset($product->images[0]) && !empty($product->images[0]->image_path)
+                        ? Url::to('@web/' . Html::encode($product->images[0]->image_path))
+                        : Url::to('@web/images/no-image.png'),
+                    ['class' => 'product-image']
+                ),
+                ['site/product', 'id' => $product->id]
+            ) ?>
+
+            <!-- Product details -->
+            <div class="product-details">
+                <!-- User Info -->
+                <div class="user-info">
+                    <?= Html::img(
+                        $product->user && !empty($product->user->profile_image)
+                            ? Url::to('@web/' . Html::encode($product->user->profile_image))
+                            : Url::to('@web/images/default-profile.png'),
+                        ['class' => 'profile-thumb']
+                    ) ?>
+                    <span><?= Html::encode(trim($product->user->first_name . ' ' . $product->user->last_name)) ?></span>
+                </div>
+
+                <h4><?= Html::encode($product->name) ?></h4>
+                <p><strong>Price:</strong> TSh. <?= Html::encode($product->price) ?></p>
+                <p><strong>Status:</strong> <?= Html::encode(ucwords(str_replace('_', ' ', $product->status))) ?></p>
+                <p><?= Html::encode(mb_strimwidth($product->description, 0, 100, '...')) ?></p>
+                <p style="font-size: 12px; color: gray;">
+                    Uploaded: <?= date('M d, Y H:i', strtotime($product->created_at)) ?>
+                </p>
+
+                <!-- Recent Comment Preview -->
+                <div class="comment-preview" style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #ddd;">
+                    
+                    <?php
+                        $latestComment = $product->recentComments[0] ?? null;
+                        if ($latestComment):
+                    ?>
+                        <div style="font-size: 13px; color: #333;">
+                            <em><?= Html::encode($latestComment->user->username ?? 'Anonymous') ?>:</em>
+                            <?= Html::encode(mb_strimwidth($latestComment->comment, 0, 80, '...')) ?>
+                        </div>
+
+                    <?php endif; ?>
+                </div>
+
+                <?= Html::a('View Details', ['site/product', 'id' => $product->id], ['class' => 'btn btn-sm btn-outline-primary']) ?>
             </div>
         </div>
     <?php endforeach; ?>
 </div>
-
-<!-- Modal for product details -->
-<?php Modal::begin([
-    'id' => 'product-modal',
-    'size' => Modal::SIZE_LARGE,
-]); ?>
-<div id="product-modal-content"></div>
-<?php Modal::end(); ?>
-<?php
-use yii\widgets\ActiveForm;
-use yii\helpers\Html;
-use yii\helpers\Url;
-use yii\bootstrap5\Modal;
-
-$js = <<<JS
-// Toggle between view and edit mode for address and bio
-document.getElementById('edit-profile-btn').addEventListener('click', function() {
-    // Hide Edit button, show Submit button and form inputs
-    this.style.display = 'none';
-    document.getElementById('submit-profile-btn').style.display = 'inline-block';
-
-    // Show inputs
-    document.querySelectorAll('.editable-field').forEach(el => el.style.display = 'block');
-    // Hide text spans
-    document.querySelectorAll('.readonly-field').forEach(el => el.style.display = 'none');
-});
-JS;
-$this->registerJs($js);
-
-$this->registerCss("
-.cover-photo {
-    background: url('". ($user->cover_image ? Url::to('@web/' . $user->cover_image) : Url::to('@web/images/cover-placeholder.jpg')) ."') no-repeat center center;
-    background-size: cover;
-    height: 250px;
-    position: relative;
-}
-
-.cover-edit-icon {
-    position: absolute;
-    top: 10px;
-    right: 20px;
-    background: #007bff;
-    color: white;
-    border-radius: 50%;
-    padding: 6px;
-    cursor: pointer;
-    font-size: 14px;
-    z-index: 2;
-}
-
-.logout-icon-container {
-    position: absolute;
-    top: 10px;
-    right: 80px; /* left of cover-edit-icon */
-    z-index: 2;
-}
-
-#logout-btn {
-    padding: 6px 14px;
-    font-size: 14px;
-    font-weight: 600;
-    background-color: #007bff;
-    border: none;
-    color: white;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-#logout-btn:hover {
-    background-color: #0056b3;
-}
-
-.profile-container {
-    position: absolute;
-    bottom: -70px;
-    left: 30px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.profile-image {
-    width: 140px;
-    height: 140px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 4px solid #fff;
-}
-
-.edit-icon {
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    background: #007bff;
-    color: white;
-    border-radius: 50%;
-    padding: 6px;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-#profile-image-input {
-    display: none;
-}
-
-.profile-details {
-    margin-top: 90px;
-    padding: 20px;
-}
-
-#submit-profile-btn {
-    display: none; /* Hidden initially */
-}
-");
-
-?>
-
-<?php $form = ActiveForm::begin([
-    'action' => ['site/update-profile'],
-    'options' => ['enctype' => 'multipart/form-data'],
-]); ?>
-
-<!-- Cover Photo -->
-<div class="cover-photo">
-
-    <!-- Logout button -->
-    <div class="logout-icon-container">
-        <?= Html::beginForm(['/site/logout'], 'post') ?>
-        <?= Html::submitButton('Logout', ['id' => 'logout-btn']) ?>
-        <?= Html::endForm() ?>
-    </div>
-
-    <!-- Cover image edit icon -->
-    <label for="cover-image-input" class="cover-edit-icon" title="Edit Cover Image">✎</label>
-    <?= $form->field($user, 'cover_image')->fileInput([
-        'id' => 'cover-image-input',
-        'onchange' => 'this.form.submit()'
-    ])->label(false) ?>
-
-    <!-- Profile photo container -->
-    <div class="profile-container">
-        <?= Html::img(
-            $user->profile_image ? Url::to('@web/' . $user->profile_image) : Url::to('@web/images/default-profile.png'),
-            ['class' => 'profile-image']
-        ) ?>
-        <label for="profile-image-input" class="edit-icon" title="Edit Profile Image">✎</label>
-    </div>
-</div>
-
-<?= $form->field($user, 'profile_image')->fileInput([
-    'id' => 'profile-image-input',
-    'onchange' => 'this.form.submit()'
-])->label(false) ?>
-
-<!-- Profile Information -->
-<div class="profile-details">
-    <h2>
-        Profile Information
-        <?= Html::button('Edit', ['id' => 'edit-profile-btn', 'class' => 'btn btn-sm btn-secondary', 'style' => 'margin-left:10px;']) ?>
-    </h2>
-
-    <p><strong>First Name:</strong> <?= Html::encode($user->first_name) ?></p>
-    <p><strong>Last Name:</strong> <?= Html::encode($user->last_name) ?></p>
-    <p><strong>Email:</strong> <?= Html::encode($user->email) ?></p>
-    <p><strong>Phone Number:</strong> <?= Html::encode($user->phone_number) ?></p>
-
-    <div class="row">
-        <div class="col-md-6">
-            <!-- Display mode -->
-            <p class="readonly-field"><strong>Address:</strong> <?= Html::encode($user->address) ?></p>
-            <!-- Edit mode input -->
-            <div class="editable-field" style="display:none;">
-                <?= $form->field($user, 'address')->textInput()->label(false) ?>
-            </div>
-        </div>
-        <div class="col-md-6">
-            <!-- Display mode -->
-            <p class="readonly-field"><strong>Bio:</strong> <?= nl2br(Html::encode($user->bio)) ?></p>
-            <!-- Edit mode textarea -->
-            <div class="editable-field" style="display:none;">
-                <?= $form->field($user, 'bio')->textarea(['rows' => 3])->label(false) ?>
-            </div>
-        </div>
-    </div>
-
-    <div class="form-group">
-        <?= Html::submitButton('Update Profile', ['class' => 'btn btn-primary', 'id' => 'submit-profile-btn']) ?>
-    </div>
-</div>
-
-<?php ActiveForm::end(); ?>
-
-<!-- PRODUCT UPLOAD FORM -->
-<hr>
-<h2>Your Products</h2>
-
-<?php $productForm = ActiveForm::begin([
-    'action' => ['site/upload-product'],
-    'options' => ['enctype' => 'multipart/form-data'],
-]); ?>
-
-<div class="row">
-    <div class="col-md-6">
-        <?= $productForm->field($productModel, 'name')->textInput(['maxlength' => true]) ?>
-    </div>
-    <div class="col-md-6">
-        <?= $productForm->field($productModel, 'price')->textInput(['type' => 'number', 'step' => '0.01', 'min' => 0]) ?>
-    </div>
-</div>
-
-<?= $productForm->field($productModel, 'description')->textarea(['rows' => 3]) ?>
-
-<?= $productForm->field($productModel, 'status')->dropDownList([
-    'on_sale' => 'On Sale',
-    'sold' => 'Sold',
-]) ?>
-
-<?= $productForm->field($productModel, 'imageFiles[]')->fileInput([
-    'multiple' => true,
-    'accept' => 'image/*',
-])->label('Upload Images (max 5)') ?>
-
-<div class="form-group">
-    <?= Html::submitButton('Upload Product', ['class' => 'btn btn-success']) ?>
-</div>
-
-<?php ActiveForm::end(); ?>
-
-<!-- DISPLAY USERS PRODUCTS -->
-<div class="product-grid" style="display:flex; flex-wrap:wrap; gap:10px;">
-    <?php foreach ($products as $product): ?>
-        <div class="product-item" style="width:120px; text-align:center; cursor:pointer;" data-id="<?= $product->id ?>">
-            <?php
-            $img = ($product->images && count($product->images) > 0)
-                ? Url::to('@web/' . $product->images[0]->image_path)
-                : Url::to('@web/images/no-image.png');
-            ?>
-            <?= Html::img($img, ['style' => 'width:100%; height:100px; object-fit:cover; border-radius:6px;']) ?>
-            <div style="font-size: 13px; margin-top: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-                <?= Html::encode($product->name) ?>
-            </div>
-        </div>
-    <?php endforeach; ?>
-</div>
-
-<!-- Modal for product details -->
-<?php Modal::begin([
-    'id' => 'product-modal',
-    'size' => Modal::SIZE_LARGE,
-]); ?>
-<div id="product-modal-content"></div>
-<?php Modal::end(); ?>

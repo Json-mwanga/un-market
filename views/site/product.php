@@ -15,7 +15,7 @@ $this->title = $model->name;
     <!-- Show all images -->
     <div style="display: flex; gap: 10px; flex-wrap: wrap;">
         <?php foreach ($model->images as $img): ?>
-            <img src="<?= Html::encode($img->url) ?>" style="width: 120px; border-radius: 5px;">
+            <img src="<?= Url::to('@web/' . Html::encode($img->image_path)) ?>" style="width: 120px; border-radius: 5px;">
         <?php endforeach; ?>
     </div>
 </div>
@@ -29,7 +29,7 @@ $this->title = $model->name;
     <?php if (!Yii::$app->user->isGuest): ?>
         <?php $form = ActiveForm::begin(); ?>
 
-        <?= $form->field($newComment, 'content')->textarea([
+        <?= $form->field($newComment, 'comment')->textarea([
             'rows' => 3, 
             'placeholder' => 'Write your comment here...'
         ])->label(false) ?>
@@ -47,7 +47,7 @@ $this->title = $model->name;
         <?php foreach ($comments as $comment): ?>
             <div style="border-bottom: 1px solid #ddd; margin-bottom: 10px; padding: 5px 0;">
                 <strong><?= Html::encode($comment->user->username ?? 'Guest') ?>:</strong>
-                <p><?= Html::encode($comment->content) ?></p>
+                <p><?= Html::encode($comment->comment) ?></p>
                 <small class="text-muted"><?= Yii::$app->formatter->asRelativeTime($comment->created_at) ?></small>
             </div>
         <?php endforeach; ?>
