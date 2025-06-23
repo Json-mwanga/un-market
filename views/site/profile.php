@@ -44,28 +44,24 @@ $this->registerJs($js);
 
 /* Logout button container, positioned top-left */
 .logout-icon-container {
-    position: absolute;
-    top: 10px;
-    left: 20px;
-    z-index: 2;
+    text-align: center;
+    margin-top:40px;
 }
 
 #logout-btn {
-    padding: 5px 10px;
-    font-size: 13px;
+    padding: 8px 16px;
+    font-size: 14px;
     font-weight: bold;
     display: flex;
-    align-items: center;
-    gap: 4px;
-    background-color: #dc3545;
+    background-color:rgba(25, 144, 168, 0.68);
     border: none;
     color: white;
-    border-radius: 4px;
+    border-radius: 6px;
     cursor: pointer;
 }
 
 #logout-btn:hover {
-    background-color: #c82333;
+    background-color:rgba(170, 66, 77, 0.65);
 }
 
 #cover-image-input {
