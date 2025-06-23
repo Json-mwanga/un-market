@@ -122,12 +122,6 @@ $this->registerJs($js);
 
 <!-- Cover Photo -->
 <div class="cover-photo">
-    <!-- Logout button -->
-    <div class="logout-icon-container">
-        <?= Html::beginForm(['/site/logout'], 'post') ?>
-            <?= Html::submitButton('⎋ Logout', ['id' => 'logout-btn']) ?>
-        <?= Html::endForm() ?>
-    </div>
 
     <!-- Cover image edit icon -->
     <label for="cover-image-input" class="cover-edit-icon" title="Edit Cover Image">✎</label>
@@ -242,6 +236,9 @@ $this->registerJs($js);
         </div>
     <?php endforeach; ?>
 </div>
+
+
+
 
 <!-- Modal for product details -->
 <?php Modal::begin([
