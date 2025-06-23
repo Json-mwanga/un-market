@@ -238,7 +238,12 @@ $this->registerJs($js);
 </div>
 
 
-
+    <!-- Logout button -->
+    <div class="logout-icon-container">
+        <?= Html::beginForm(['/site/logout'], 'post') ?>
+            <?= Html::submitButton('⎋ Logout', ['id' => 'logout-btn']) ?>
+        <?= Html::endForm() ?>
+    </div>
 
 <!-- Modal for product details -->
 <?php Modal::begin([
